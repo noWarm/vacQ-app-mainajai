@@ -1,0 +1,41 @@
+@startuml
+
+title Manage Hospital Use Case : Get All Hospital
+
+== Initialization ==
+note over app : mount the router on startup with app.use("/api/v1/hospitals", hospitalRouter)
+activate app
+
+Database mongoDB
+note over mongoDB : connect to mongoDB via mongoose
+activate mongoDB
+
+== Get Request ==
+-> app: get('/api/v1/hospitals')
+
+activate hospitalRouter
+app -> hospitalRouter: route('/')
+
+activate hospitalController
+hospitalRouter -> hospitalController: getAllHospital(req, res, next)
+
+activate hospitalSchema
+hospitalController -> hospitalSchema: find()
+
+alt successful case
+    Database mongoDB
+
+    hospitalSchema -> mongoDB : findAll
+    mongoDB --> hospitalSchema : hospitals
+    hospitalSchema --> hospitalController : hospitals
+    hospitalController --> hospitalRouter : response(200, hospitals.length, hospitals)
+    hospitalRouter --> app : response(200, hospitals.length, hospitals)
+    <-- app : response(200, hospitals.length, hospitals)
+
+else some failure
+    hospitalSchema --> hospitalController : error
+    hospitalController --> hospitalRouter : response(400)
+    hospitalRouter --> app : response(400)
+    <-- app : response(400)
+end
+@enduml

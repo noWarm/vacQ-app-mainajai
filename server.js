@@ -13,9 +13,9 @@ app.use(express.json());
 
 // Mount the routers
 const hospitalRouter = require("./routes/hospitals");
-app.use("/api/v1/hospitals", hospitalRouter);
-
 const authRouter = require("./routes/auth");
+
+app.use("/api/v1/hospitals", hospitalRouter);
 app.use("/api/v1/auth",authRouter);
 
 const PORT = process.env.PORT || 5555;

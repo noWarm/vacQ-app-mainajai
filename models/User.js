@@ -36,12 +36,14 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Encrypt password using bcrypt
+// TODO: what the fuck is this?? understand it.
 UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = await bcrypt.hash(this.password, salt); // will it store a salt here too?
 });
 
-//Sign JWT and return
+// //Sign JWT and return
+// TODO: what the fuck is 'this'?? understand it.
 UserSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
@@ -49,6 +51,8 @@ UserSchema.methods.getSignedJwtToken = function () {
 };
 
 // Match user entered password  to hashed password in database
+// this will be used for login procedure
+// return true if the passwords are matched
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

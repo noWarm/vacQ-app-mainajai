@@ -1,15 +1,16 @@
 const express = require("express");
 const connectDB = require("./config/db");
+const cookieParser=require('cookie-parser');
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
-
 connectDB();
 
 const app = express();
 // Use a json body parser
 // declare this before you setupt the hospitalRouter naja jubjub
 app.use(express.json());
+app.use(cookieParser());
 
 // Mount the routers
 const hospitalRouter = require("./routes/hospitals");

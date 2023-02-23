@@ -1,13 +1,15 @@
-// pseudocode
-// if no token, deny access
-// if provided token is valid, grant access then do next()
-// if provided token is invalid, deny access
+// this file has both authentication (protect) & authorization (handling roles)
 
 const User = require("../models/User");
 const jwt = require('jsonwebtoken');
 
 
 // exports.protect TODO: what is this exports. syntax
+// this is authentication
+// pseudocode
+// if no token, deny access
+// if provided token is valid, grant access then do next()
+// if provided token is invalid, deny access
 
 exports.protect = async(req, res, next) => {
     let token;  // currently undefined
@@ -39,3 +41,11 @@ exports.protect = async(req, res, next) => {
     }
 }
 
+exports.authorize=(...roles)=>{
+    return (req,res,next)=>{
+        if(!roles.includes(req.user.role)){
+            return res.status(403).json({success:false, msg:'User role '+ req.user.role+' is not authorized to access this route'})
+        }
+        next();
+    }
+}

@@ -18,7 +18,7 @@ exports.register = async (req, res, next) => {
     // res.status(200).json({success:true, token});
 
     sendTokenResponse(user, 200, res);
-    s;
+
   } catch (err) {
     res.status(400).json({ success: false });
     console.log(err.stack);
@@ -68,6 +68,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   if (process.env.NODE_ENV === "production") {
     options.secure = true; //TODO: why is this!?!?
   }
+
   res
     .status(statusCode)
     .cookie("token", token, options)

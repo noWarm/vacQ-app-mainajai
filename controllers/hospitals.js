@@ -3,7 +3,7 @@ const Hospital = require("../models/Hospital");
 exports.getAllHospital = async (req, res, next) => {
   // exclude the select and sort from the queryStr first
   const reqQuery = { ...req.query };
-  const removeFields = ["select", "sort"];
+  const removeFields = ["select", "sort", "page", "limit"];
   removeFields.forEach((param) => delete reqQuery[param]);
   console.log(reqQuery);
 
@@ -31,10 +31,34 @@ exports.getAllHospital = async (req, res, next) => {
   } else {
     query = query.sort("-createdAt");
   }
-  
+  // set up pagination params
+  const page = parseInt(req.query.page, 10) || 1;  // specify the page number, otherwise first page
+  const limit = parseInt(req.query.limit, 10) || 25; // specify page size
+  const startIndex = (page - 1) * limit; // starting index
+  const endIndex = page * limit;
+
   try {
+    const total = await Hospital.countDocuments();
+    query = query.skip(startIndex).limit(limit);
+
     const hospitals = await query; // execute the query here
     console.log(req.query);
+
+    // handle pagination 
+    // note that this part will not be used for our back end, but should be sent to the front end
+    // so that once a NEXT and PREV button in front end is implemented
+    // it could derive the value of the next and previous page
+    // and in turn updates the query parameter by itself
+    
+    const pagination = {};
+
+    if (endIndex < total) {
+      pagination.next = {page: page + 1, limit};
+    }
+
+    if (startIndex > 0) {
+      pagination.prev = {page: page - 1, limit};
+    }
 
     res
       .status(200)

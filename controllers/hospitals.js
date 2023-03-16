@@ -2,7 +2,9 @@ const Hospital = require("../models/Hospital");
 
 exports.getAllHospital = async (req, res, next) => {
   try {
-    const hospitals = await Hospital.find();
+    const hospitals = await Hospital.find(req.query);
+    console.log(req.query);
+    
     res
       .status(200)
       .json({ success: true, count: hospitals.length, data: hospitals });

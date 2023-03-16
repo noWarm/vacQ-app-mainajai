@@ -1,16 +1,37 @@
 const Hospital = require("../models/Hospital");
 
 exports.getAllHospital = async (req, res, next) => {
+  // exclude the select and sort from the queryStr first
+  const reqQuery = { ...req.query };
+  const removeFields = ["select", "sort"];
+  removeFields.forEach((param) => delete reqQuery[param]);
+  console.log(reqQuery);
+
+  // once select and sort is removed, process the regular expressions
   let queryStr = JSON.stringify(req.query); // queryStr is now a JSON string, but why ?
   queryStr = queryStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}`
   );
 
-  let query
-  query = Hospital.find(JSON.parse(queryStr));  // the query is not executed yet !?
+  // define the query to be executed
+  let query;
+  query = Hospital.find(JSON.parse(queryStr)); // the query is not executed yet !?
   // FIXME: why Stringfy then parse wa ?? wtf?
 
+  // post-processing with select and sort
+  if (req.query.select) {
+    const fields = req.query.select.split(",").join(" ");
+    query = query.select(fields);
+  }
+  // sort
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort("-createdAt");
+  }
+  
   try {
     const hospitals = await query; // execute the query here
     console.log(req.query);

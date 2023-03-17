@@ -1,21 +1,25 @@
 const Appointment = require("../models/Appointment");
 
 // @desc    Get all appointments
-// @route   GET /api/v1/appointments
+// @route   GET /api/v1/.../appointments
 // @access  Private
 exports.getAppointments = async (req, res, next) => {
   let query;
 
+  let findParams = {};
+  
+  // if the method is being used in a nested url of /hospitals/:hospitalId/appointments
+  if (req.params.hospitalId) {
+    findParams.hospital = req.params.hospitalId;
+  }
+
   // general users can see only their appointments
   if (req.user.role !== "admin") {
-    query = Appointment.find({ user: req.user.id }); // doesn't return any documents even though there are matches
-  } else {
-    // if you are admin, you can see all
-    query = Appointment.find();
+    findParams.user = req.user.id;
   }
 
   // we'll add more fields to the hospital field, turning the query document into a nested object
-  query.populate({
+  query = Appointment.find(findParams).populate({
     path: 'hospital',
     select: 'name province tel',
   });
@@ -36,29 +40,23 @@ exports.getAppointments = async (req, res, next) => {
   }
 };
 
-// @desc    Get all appointments for a hospitalId
-// @route   GET /api/v1/hospitals/:hospitalId/appointments
+// @desc    Get an appointment based on its id
+// @route   GET /api/v1/appointments/:id
 // @access  Private
-exports.getAppointment = async (req, res, next) => {
-  let query;
-  const userId = req.user.id;
-  const hospitalId = req.params.hospitalId;
-
-  // general users can see only their appointments
-  if (req.user.role !== "admin") {
-    query = Appointment.find({ user: userId, hospital: hospitalId });
-  } else {
-    // if you are admin, you can see all
-    query = Appointment.find({ hospital: hospitalId });
-  }
-
+exports.getAppointmentById = async (req, res, next) => {
   try {
-    const appointments = await query;
+    const appointment = await Appointment.findById(req.params.id).populate({
+      path: 'hospital',
+      select: 'name description tel',
+    });
+
+    if (!appointment) {
+      return res.status(404).json({success:false, message: `No appointment with the id of ${req.params.id}`})
+    }
 
     res.status(200).json({
       success: true,
-      count: appointments.length,
-      data: appointments,
+      data: appointment,
     });
   } catch (error) {
     console.log(error.stack);
@@ -67,3 +65,5 @@ exports.getAppointment = async (req, res, next) => {
       .json({ success: false, message: "Cannot find Appointment" });
   }
 };
+
+

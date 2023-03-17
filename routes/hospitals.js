@@ -7,6 +7,7 @@ const {
   deleteHospital,
 } = require("../controllers/hospitals");
 const { protect, authorize } = require("../middleware/auth");
+const appointmentRouter = require("./appointments");
 router = express.Router();
 
 router
@@ -19,5 +20,7 @@ router
   .get(getHospital)
   .put(protect, authorize("admin"), updateHospital)
   .delete(protect, authorize("admin"), deleteHospital);
+
+router.use("/:hospitalId/appointments", appointmentRouter); // the hospitalId params will be sent to the appointmentRouter because the option mergeParams:true
 
 module.exports = router;

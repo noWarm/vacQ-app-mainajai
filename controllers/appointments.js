@@ -14,6 +14,12 @@ exports.getAppointments = async (req, res, next) => {
     query = Appointment.find();
   }
 
+  // we'll add more fields to the hospital field, turning the query document into a nested object
+  query.populate({
+    path: 'hospital',
+    select: 'name province tel',
+  });
+
   try {
     const appointments = await query;
 

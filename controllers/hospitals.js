@@ -16,7 +16,7 @@ exports.getAllHospital = async (req, res, next) => {
 
   // define the query to be executed
   let query;
-  query = Hospital.find(JSON.parse(queryStr)); // the query is not executed yet !?
+  query = Hospital.find(JSON.parse(queryStr)).populate('appointments'); // the query is not executed yet !?
   // FIXME: why Stringfy then parse wa ?? wtf?
 
   // post-processing with select and sort

@@ -102,3 +102,56 @@ exports.addAppointment = async (req, res, next) => {
       .json({ success: false, message: "Cannot create Appointment" });
   }
 };
+
+// @desc    Update appointment
+// @route   PUT /api/v1/appointments/:id
+// @access  Private
+exports.updateAppointment = async (req, res, next) => {
+  try {
+    let appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: `No appointment with the id of ${req.params.id}`,
+      });
+    }
+
+    appointment = await Appointment.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    }).populate({
+      path: "hospital",
+      select: "name description tel",
+    });
+    res.status(200).json({ success: true, data: appointment });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot update Appointment" });
+  }
+};
+
+// @desc    Delete appointment
+// @route   DELETE /api/v1/appointments/:id
+// @access  Private
+exports.deleteAppoinment = async (req, res, next) => {
+  try {
+    let appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: `No appointment with the id of ${req.params.id}`,
+      });
+    }
+
+    await appointment.remove();
+    res.status(200).json({ success: true, data: {} });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot delete Appointment" });
+  }
+};

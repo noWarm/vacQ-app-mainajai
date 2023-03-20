@@ -1,3 +1,6 @@
 node_modules/*
 
 config/config.env
+
+# ignoring my mcv assignment keynotes and pdf
+mcv-assignments

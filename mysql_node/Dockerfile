@@ -5,6 +5,9 @@ ENV MYSQL_ROOT_PASSWORD 123
 ENV MYSQL_USER swpractice
 ENV MYSQL_PASSWORD 123
 
+# so that the server is visible to the host
+EXPOSE 3366
+
 # Copy the SQL file into the container
 COPY VacQ-initdb.sql /docker-entrypoint-initdb.d/
 

@@ -18,7 +18,6 @@ exports.register = async (req, res, next) => {
     // res.status(200).json({success:true, token});
 
     sendTokenResponse(user, 200, res);
-
   } catch (err) {
     res.status(400).json({ success: false });
     console.log(err.stack);
@@ -75,7 +74,6 @@ const sendTokenResponse = (user, statusCode, res) => {
     .json({ success: true, token });
 };
 
-
 //TODO: its use for the signed in user to get info about himself
 exports.getMe = async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -88,12 +86,14 @@ exports.getMe = async (req, res, next) => {
 //@desc     Log user out / clear cookie
 //@route    GET /api/v1/auth/logout
 //@access   Private
-exports.logout=async(req,res,next)=>{
-  res.cookie('token','none',{
-      expires: new Date(Date.now()+ 10*1000),
-      httpOnly:true
-});
+exports.logout = async (req, res, next) => {
+  console.log("in logout woooo")
+  res.cookie("token", "none", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
   res.status(200).json({
-      success:true,
-data:{} });
-}
+    success: true,
+    data: {},
+  });
+};

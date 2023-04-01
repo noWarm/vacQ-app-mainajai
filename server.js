@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("./config/db");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const mongoSanitize=require('express-mongo-sanitize');
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
@@ -14,6 +15,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors());
+
+// prevent sql-injection by sanitizing the data first
+app.use(mongoSanitize());
 
 // Mount the routers
 const hospitalRouter = require("./routes/hospitals");

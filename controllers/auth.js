@@ -25,29 +25,40 @@ exports.register = async (req, res, next) => {
 };
 
 exports.login = async (req, res, next) => {
-  const { email, password } = req.body;
-  // Validate email & password
-  if (!email || !password) {
-    return res
-      .status(400)
-      .json({ success: false, msg: "Please provide email and password" });
-  }
-  // Check for user
-  const user = await User.findOne({ email }).select("+password");
-  if (!user) {
-    return res.status(400).json({ success: false, msg: "Invalid credentials" });
-  }
-  // Check if password matches
-  const isMatch = await user.matchPassword(password);
-  if (!isMatch) {
-    return res.status(400).json({ success: false, msg: "Invalid credentials" });
-  }
+  try {
+    const { email, password } = req.body;
+    // Validate email & password
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide email and password" });
+    }
+    // Check for user
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) {
+      console.log("no such user");
+      return res
+        .status(400)
+        .json({ success: false, msg: "Invalid credentials" });
+    }
+    // Check if password matches
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      console.log("invalid password");
+      return res
+        .status(400)
+        .json({ success: false, msg: "Invalid credentials" });
+    }
 
-  // create the token and return it too
-  //  const token = user.getSignedJwtToken();
-  //  res.status(200).json({success:true, token});
+    // create the token and return it too
+    //  const token = user.getSignedJwtToken();
+    //  res.status(200).json({success:true, token});
 
-  sendTokenResponse(user, 200, res);
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    res.status(400).json({ success: false, message: err});
+    console.log(err.stack);
+  }
 };
 
 // This function is wrapper for the previous
@@ -87,7 +98,7 @@ exports.getMe = async (req, res, next) => {
 //@route    GET /api/v1/auth/logout
 //@access   Private
 exports.logout = async (req, res, next) => {
-  console.log("in logout woooo")
+  console.log("in logout woooo");
   res.cookie("token", "none", {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,

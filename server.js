@@ -2,7 +2,10 @@ const express = require("express");
 const connectDB = require("./config/db");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const mongoSanitize=require('express-mongo-sanitize');
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
 
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
@@ -19,7 +22,21 @@ app.use(cors());
 // prevent sql-injection by sanitizing the data first
 app.use(mongoSanitize());
 
+// set security headers
+app.use(helmet());
+
+// prevent xss
+app.use(xss());
+
+//Rate Limiting
+const limiter = rateLimit({
+  windowsMs: 10 * 60 * 1000, //10 mins
+  max: 1,
+});
+app.use(limiter);
+
 // Mount the routers
+// important that you mount the router after you used all other npm packages
 const hospitalRouter = require("./routes/hospitals");
 const authRouter = require("./routes/auth");
 const appointmentRouter = require("./routes/appointments");

@@ -37,21 +37,6 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// use swagger so that it shows the api routes
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Library API",
-      version: "1.0.0",
-      description: "A simple Express VacQ API",
-    },
-  },
-  apis: ["./routes/*.js"],
-};
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
-
 // Mount the routers
 // important that you mount the router after you used all other npm packages
 const hospitalRouter = require("./routes/hospitals");
@@ -61,6 +46,27 @@ const appointmentRouter = require("./routes/appointments");
 app.use("/api/v1/hospitals", hospitalRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/appointments", appointmentRouter);
+
+
+// use swagger so that it shows the api routes
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Library API",
+      version: "1.0.0",
+      description: "A simple Express VacQ API",
+    },
+    server: [
+      {
+        url: "http:localhost:7777/api/v1",
+      },
+    ],
+  },
+  apis: ["./routes/*.js"],
+};
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 const PORT = process.env.PORT || 5555;
 const server = app.listen(
